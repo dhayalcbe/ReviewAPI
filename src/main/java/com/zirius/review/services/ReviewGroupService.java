@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.zirius.review.dto.ReviewGroupDTO;
 import com.zirius.review.dto.ReviewGroupResponse;
 import com.zirius.review.error.ErrorDetails;
 import com.zirius.review.repository.ReviewGroupRepository;
@@ -20,22 +21,17 @@ public class ReviewGroupService {
 	private ReviewGroupRepository repository;
 
 	@Transactional
-	public ResponseEntity<ReviewGroupResponse> createReviewGroup(ReviewGroup reviewGroup) {
-		ReviewGroupResponse reviewGroupResponse;
+	public ResponseEntity<ReviewGroupResponse> createReviewGroup(ReviewGroupDTO reviewGroupDTO) {
+		ReviewGroupResponse reviewGroupResponse = null;
+		ReviewGroup reviewGroup = ReviewGroup.builder().topic(reviewGroupDTO.getTopic()).build();
 		ReviewGroup savedEntity = repository.save(reviewGroup);
-		if (null != savedEntity) {
-			reviewGroupResponse = getReviewGroupResponse(HttpStatus.CREATED,
-					Constants.REVIEW_GROUP_CREATED_SUCCESSFULLY, savedEntity.getId(), null);
-		} else {
-			reviewGroupResponse = getReviewGroupResponse(HttpStatus.INTERNAL_SERVER_ERROR,
-					Constants.FAILED_TO_CREATE_REVIEW_GROUP, null,
-					ErrorDetails.builder().errorMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()).build());
-		}
+		reviewGroupResponse = setReviewGroupResponse(HttpStatus.CREATED, Constants.REVIEW_GROUP_CREATED_SUCCESSFULLY,
+				savedEntity.getId(), null);
 		return ResponseEntity.status(reviewGroupResponse.getStatus()).body(reviewGroupResponse);
 	}
 
-	private ReviewGroupResponse getReviewGroupResponse(HttpStatus status, String message, Long reviewGroupId, ErrorDetails errors)
-	{
+	private ReviewGroupResponse setReviewGroupResponse(HttpStatus status, String message, Long reviewGroupId,
+			ErrorDetails errors) {
 		ReviewGroupResponse reviewGroupResponse = new ReviewGroupResponse();
 		reviewGroupResponse.setStatus(status);
 		reviewGroupResponse.setMessage(message);

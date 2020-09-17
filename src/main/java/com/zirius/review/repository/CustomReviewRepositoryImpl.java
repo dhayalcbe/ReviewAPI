@@ -18,7 +18,7 @@ public class CustomReviewRepositoryImpl implements CustomReviewRepository {
 
 	@Override
 	public List<Review> getReviewsByReviewGroupId(Long reviewGroupId) {
-		TypedQuery<Review> query = em.createQuery("select r from Review r join r.reviewGroup rg where rg.id = :reviewGroupId", Review.class);
+		TypedQuery<Review> query = em.createQuery("SELECT r from Review r JOIN r.reviewGroup rg WHERE rg.id = :reviewGroupId", Review.class);
 		query.setParameter("reviewGroupId", reviewGroupId);
 		List<Review> reviews = query.getResultList();
 		return reviews;

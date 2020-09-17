@@ -1,5 +1,6 @@
 package com.zirius.review.services;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.zirius.review.dto.AverageRatingResponse;
+import com.zirius.review.dto.ReviewDTO;
 import com.zirius.review.dto.ReviewResponse;
 import com.zirius.review.dto.ReviewsDTO;
 import com.zirius.review.error.ErrorDetails;
@@ -38,9 +40,10 @@ public class ReviewService {
 		List<Review> reviews = reviewMapper.toReviews(reviewsDTO.getReviews());
 		if (!CollectionUtils.isEmpty(reviews)) {
 			reviewRepository.saveAll(reviews);
-			reviewResponse = getReviewResponse(HttpStatus.CREATED, Constants.REVIEWS_SAVE_SUCCESSFUL, reviewsDTO, null);
+			reviewResponse = setReviewResponse(HttpStatus.CREATED, Constants.REVIEWS_SAVE_SUCCESSFUL,
+					reviewsDTO.getReviews(), null);
 		} else {
-			reviewResponse = getReviewResponse(HttpStatus.INTERNAL_SERVER_ERROR, Constants.REVIEWS_SAVE_FAILED, null,
+			reviewResponse = setReviewResponse(HttpStatus.INTERNAL_SERVER_ERROR, Constants.REVIEWS_SAVE_FAILED, null,
 					ErrorDetails.builder().errorMessage(Constants.REVIEWS_SAVE_FAILED).build());
 		}
 
@@ -50,14 +53,14 @@ public class ReviewService {
 	public ResponseEntity<ReviewResponse> getReviews(Long reviewGroupId) {
 		List<Review> reviews = null;
 		ReviewResponse reviewResponse = null;
-		ReviewsDTO reviewsDTO = new ReviewsDTO();
 		if (null != reviewGroupId) {
 			reviews = customReviewRepository.getReviewsByReviewGroupId(reviewGroupId);
 		} else {
 			reviews = reviewRepository.findAll();
 		}
-		reviewsDTO.setReviews(reviewMapper.toReviewDTOs(reviews));
-		reviewResponse = getReviewResponse(HttpStatus.OK, Constants.REVIEW_RETRIEVED_SUCCESSFULLY, reviewsDTO, null);
+		List<ReviewDTO> reviewDTOs = reviewMapper.toReviewDTOs(reviews);
+		Collections.sort(reviewDTOs);
+		reviewResponse = setReviewResponse(HttpStatus.OK, Constants.REVIEW_RETRIEVED_SUCCESSFULLY, reviewDTOs, null);
 		return ResponseEntity.status(reviewResponse.getStatus()).body(reviewResponse);
 	}
 
@@ -72,15 +75,17 @@ public class ReviewService {
 			}
 			float average = sumOfRatings / noOfRatings;
 			String averageRating = String.format("%.2f", average);
-			averageRatingresponse = getAverageRatingResponse(HttpStatus.OK, Constants.RETRIEVE_AVERAGE_RATING_SUCCESSFUL, averageRating, null);
+			averageRatingresponse = setAverageRatingResponse(HttpStatus.OK,
+					Constants.RETRIEVE_AVERAGE_RATING_SUCCESSFUL, averageRating, null);
 		} else {
-			averageRatingresponse = getAverageRatingResponse(HttpStatus.BAD_REQUEST, Constants.RETRIEVE_AVERAGE_RATING_UNSUCCESSFUL, null,
+			averageRatingresponse = setAverageRatingResponse(HttpStatus.BAD_REQUEST,
+					Constants.RETRIEVE_AVERAGE_RATING_UNSUCCESSFUL, null,
 					ErrorDetails.builder().errorMessage(Constants.NO_REVIEWS_FOUND).build());
 		}
 		return ResponseEntity.status(averageRatingresponse.getStatus()).body(averageRatingresponse);
 	}
 
-	private ReviewResponse getReviewResponse(HttpStatus status, String message, ReviewsDTO reviewsDTO,
+	private ReviewResponse setReviewResponse(HttpStatus status, String message, List<ReviewDTO> reviewsDTO,
 			ErrorDetails errors) {
 		ReviewResponse reviewResponse = new ReviewResponse();
 		reviewResponse.setStatus(status);
@@ -90,7 +95,7 @@ public class ReviewService {
 		return reviewResponse;
 	}
 
-	private AverageRatingResponse getAverageRatingResponse(HttpStatus status, String message, String averageRating,
+	private AverageRatingResponse setAverageRatingResponse(HttpStatus status, String message, String averageRating,
 			ErrorDetails errors) {
 		AverageRatingResponse averageRatingResponse = new AverageRatingResponse();
 		averageRatingResponse.setStatus(status);

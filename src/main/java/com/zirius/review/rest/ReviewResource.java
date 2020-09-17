@@ -1,5 +1,7 @@
 package com.zirius.review.rest;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,7 @@ public class ReviewResource {
 	private ReviewService reviewService;
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ReviewResponse> createReviews(@RequestBody ReviewsDTO reviewsDTO) {
+	public ResponseEntity<ReviewResponse> createReviews(@RequestBody @Valid ReviewsDTO reviewsDTO) {
 		return reviewService.createReviews(reviewsDTO);
 	}
 

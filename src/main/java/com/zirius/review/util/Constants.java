@@ -13,5 +13,6 @@ public class Constants {
 	public static final String RETRIEVE_AVERAGE_RATING_SUCCESSFUL = "Average rating retrieved successfully";
 	public static final String RETRIEVE_AVERAGE_RATING_UNSUCCESSFUL = "Average rating retrieval unsuccessful, check reviewGroupId";
 	public static final String NO_REVIEWS_FOUND = "No reviews found for the given reviewGroupId";
+	public static final String REVIEWS_IS_MANDATORY = "Reviews is mandatory";
 
 }
