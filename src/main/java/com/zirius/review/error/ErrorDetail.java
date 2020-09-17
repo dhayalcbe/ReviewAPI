@@ -1,7 +1,5 @@
 package com.zirius.review.error;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorDetails {
-		
-	private String errorMessage;
-	
-	private List<ErrorDetail> errorDetails;
+public class ErrorDetail {
 
+	private String parameter;
+	
+	private String code;
+	
+	private String description;
 }

@@ -22,7 +22,10 @@ import com.zirius.review.repository.ReviewRepository;
 import com.zirius.review.repository.model.Review;
 import com.zirius.review.util.Constants;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class ReviewService {
 
 	@Autowired
@@ -36,6 +39,7 @@ public class ReviewService {
 
 	@Transactional
 	public ResponseEntity<ReviewResponse> createReviews(ReviewsDTO reviewsDTO) {
+		log.info("START:> createReviews");
 		ReviewResponse reviewResponse = null;
 		List<Review> reviews = reviewMapper.toReviews(reviewsDTO.getReviews());
 		if (!CollectionUtils.isEmpty(reviews)) {
@@ -46,11 +50,12 @@ public class ReviewService {
 			reviewResponse = setReviewResponse(HttpStatus.INTERNAL_SERVER_ERROR, Constants.REVIEWS_SAVE_FAILED, null,
 					ErrorDetails.builder().errorMessage(Constants.REVIEWS_SAVE_FAILED).build());
 		}
-
+		log.info("END:> createReviews");
 		return ResponseEntity.status(reviewResponse.getStatus()).body(reviewResponse);
 	}
 
 	public ResponseEntity<ReviewResponse> getReviews(Long reviewGroupId) {
+		log.info("START:> getReviews");
 		List<Review> reviews = null;
 		ReviewResponse reviewResponse = null;
 		if (null != reviewGroupId) {
@@ -61,10 +66,12 @@ public class ReviewService {
 		List<ReviewDTO> reviewDTOs = reviewMapper.toReviewDTOs(reviews);
 		Collections.sort(reviewDTOs);
 		reviewResponse = setReviewResponse(HttpStatus.OK, Constants.REVIEW_RETRIEVED_SUCCESSFULLY, reviewDTOs, null);
+		log.info("END:> getReviews");
 		return ResponseEntity.status(reviewResponse.getStatus()).body(reviewResponse);
 	}
 
 	public ResponseEntity<AverageRatingResponse> getAverageRating(Long reviewGroupId) {
+		log.info("START:> getAverageRating");
 		AverageRatingResponse averageRatingresponse = null;
 		List<Review> reviews = customReviewRepository.getReviewsByReviewGroupId(reviewGroupId);
 		if (!CollectionUtils.isEmpty(reviews)) {
@@ -82,6 +89,7 @@ public class ReviewService {
 					Constants.RETRIEVE_AVERAGE_RATING_UNSUCCESSFUL, null,
 					ErrorDetails.builder().errorMessage(Constants.NO_REVIEWS_FOUND).build());
 		}
+		log.info("END:> getAverageRating");
 		return ResponseEntity.status(averageRatingresponse.getStatus()).body(averageRatingresponse);
 	}
 

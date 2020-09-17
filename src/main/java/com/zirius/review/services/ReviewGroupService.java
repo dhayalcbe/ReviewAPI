@@ -14,7 +14,10 @@ import com.zirius.review.repository.ReviewGroupRepository;
 import com.zirius.review.repository.model.ReviewGroup;
 import com.zirius.review.util.Constants;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class ReviewGroupService {
 
 	@Autowired
@@ -22,11 +25,13 @@ public class ReviewGroupService {
 
 	@Transactional
 	public ResponseEntity<ReviewGroupResponse> createReviewGroup(ReviewGroupDTO reviewGroupDTO) {
+		log.info("START:> createReviewGroup");
 		ReviewGroupResponse reviewGroupResponse = null;
 		ReviewGroup reviewGroup = ReviewGroup.builder().topic(reviewGroupDTO.getTopic()).build();
 		ReviewGroup savedEntity = repository.save(reviewGroup);
 		reviewGroupResponse = setReviewGroupResponse(HttpStatus.CREATED, Constants.REVIEW_GROUP_CREATED_SUCCESSFULLY,
 				savedEntity.getId(), null);
+		log.info("END:> createReviewGroup");
 		return ResponseEntity.status(reviewGroupResponse.getStatus()).body(reviewGroupResponse);
 	}
 
